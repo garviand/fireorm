@@ -1,3 +1,4 @@
+import { QuerySnapshot } from '@google-cloud/firestore';
 import { getPath } from 'ts-object-path';
 
 import {
@@ -149,6 +150,16 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
 
   find(): Promise<T[]> {
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj);
+  }
+
+  watch(callback: (documents: QuerySnapshot) => void): Promise<T[]> {
+    return this.executor.execute(
+      this.queries,
+      this.limitVal,
+      this.orderByObj,
+      false,
+      callback
+    );
   }
 
   async findOne(): Promise<T | null> {

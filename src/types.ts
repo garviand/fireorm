@@ -1,4 +1,4 @@
-import { OrderByDirection, DocumentReference } from '@google-cloud/firestore';
+import { OrderByDirection, DocumentReference, QuerySnapshot } from '@google-cloud/firestore';
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type PartialWithRequiredBy<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
@@ -45,6 +45,7 @@ export interface IQueryable<T extends IEntity> {
   whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
+  watch(handler: (snapshot: QuerySnapshot) => void): any;
 }
 
 export interface IOrderable<T extends IEntity> {
@@ -63,7 +64,8 @@ export interface IQueryExecutor<T> {
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
+    single?: boolean,
+    onUpdate?: (snapshot: QuerySnapshot) => void
   ): Promise<T[]>;
 }
 

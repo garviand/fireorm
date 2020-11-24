@@ -45,7 +45,7 @@ export interface IQueryable<T extends IEntity> {
   whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
-  watch(handler: (snapshot: QuerySnapshot) => void): any;
+  watch(handler: (snapshot: QuerySnapshot) => void): () => void;
 }
 
 export interface IOrderable<T extends IEntity> {
@@ -66,7 +66,7 @@ export interface IQueryExecutor<T> {
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (snapshot: QuerySnapshot) => void
-  ): Promise<T[]>;
+  ): Promise<T[]> | (() => void);
 }
 
 export interface IBaseRepository<T extends IEntity> {

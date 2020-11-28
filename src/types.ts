@@ -45,7 +45,7 @@ export interface IQueryable<T extends IEntity> {
   whereIn(prop: IWherePropParam<T>, val: IFirestoreVal[]): IQueryBuilder<T>;
   find(): Promise<T[]>;
   findOne(): Promise<T | null>;
-  watch(handler: (snapshot: T[]) => void): () => void;
+  watch(handler: (documents: T[]) => void): () => void;
 }
 
 export interface IOrderable<T extends IEntity> {

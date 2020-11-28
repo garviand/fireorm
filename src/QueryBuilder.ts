@@ -152,7 +152,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this.executor.execute(this.queries, this.limitVal, this.orderByObj) as Promise<T[]>;
   }
 
-  watch(callback: (documents: QuerySnapshot) => void): () => void {
+  watch(callback: (documents: T[]) => void): () => void {
     return this.executor.execute(
       this.queries,
       this.limitVal,

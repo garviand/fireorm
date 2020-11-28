@@ -308,7 +308,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
    * @returns {Function} An unsubscribe function that can be called to cancel the snapshot listener
    * @memberof AbstractFirestoreRepository
    */
-  watch(callback: (snapshot: QuerySnapshot) => void): () => void {
+  watch(callback: (documents: T[]) => void): () => void {
     return new QueryBuilder<T>(this).watch(callback);
   }
 
@@ -360,7 +360,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     queries: IFireOrmQueryLine[],
     limitVal?: number,
     orderByObj?: IOrderByParams,
-    single?: boolean
+    single?: boolean,
+    onUpdate?: (documents: T[]) => void
   ): Promise<T[]>;
 
   /**

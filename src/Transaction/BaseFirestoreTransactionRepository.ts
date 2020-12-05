@@ -30,7 +30,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     this.firestoreColRef = firestoreRef.collection(this.collectionPath || this.colName);
   }
 
-  execute(queries: IFireOrmQueryLine[]): Promise<T[]> {
+  execute(queries: IFireOrmQueryLine[]): Promise<T[] | (() => void)> {
     const query = queries.reduce((acc, cur) => {
       const op = cur.operator as WhereFilterOp;
       return acc.where(cur.prop, op, cur.val);

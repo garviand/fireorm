@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Query, WhereFilterOp } from '@google-cloud/firestore';
+import { CollectionReference, DocumentReference, Query, WhereFilterOp } from '@google-cloud/firestore';
 
 import {
   IRepository,
@@ -21,7 +21,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
     return this.firestoreColRef
       .doc(id)
       .get()
-      .then(d => (d.exists ? this.extractTFromDocSnap(d) : null));
+      .then(d => (d.exists ? this.extractTFromDocSnap(d).data : null));
   }
 
   async create(item: PartialBy<T, 'id'>): Promise<T> {
@@ -90,6 +90,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
+    cursor?: DocumentReference,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]> {
@@ -106,6 +107,11 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(1);
     } else if (limitVal) {
       query = query.limit(limitVal);
+    }
+
+    if (cursor) {
+      const cursorDocument = await cursor.get();
+      query = query.startAfter(cursorDocument);
     }
 
     return query.get().then(this.extractTFromColSnap);

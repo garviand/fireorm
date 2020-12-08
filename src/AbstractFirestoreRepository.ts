@@ -1,5 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import {
+  DocumentReference,
   DocumentSnapshot,
   QuerySnapshot,
   CollectionReference,
@@ -123,7 +124,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
 
     this.initializeSubCollections(entity, tran, tranRefStorage);
 
-    return entity;
+    return {
+      data: entity,
+      ref: doc.ref
+    };
   };
 
   protected extractTFromColSnap = (
@@ -131,7 +135,16 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     tran?: Transaction,
     tranRefStorage?: ITransactionReferenceStorage
   ): T[] => {
-    return q.docs.filter(d => d.exists).map(d => this.extractTFromDocSnap(d, tran, tranRefStorage));
+    let lastRef: DocumentReference | null = null;
+    const results: any = q.docs.filter(d => d.exists).map(d => {
+      lastRef = d.ref;
+      this.extractTFromDocSnap(d, tran, tranRefStorage)
+    });
+    Object.defineProperty(results, 'cursor', {
+      value: lastRef,
+      writable: false
+    });
+    return results;
   };
 
   /**
@@ -302,6 +315,14 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     return new QueryBuilder<T>(this).limit(limitVal);
   }
 
+  after(cursor: DocumentReference): IQueryBuilder<T> {
+    if (!cursor) {
+      throw new Error('a cursor must be included');
+    }
+
+    return new QueryBuilder<T>(this).after(cursor);
+  }
+
   /**
    * Returns a new QueryBuilder with an additional ascending order
    * specified by @param prop. Can only be used once per query.
@@ -400,6 +421,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   abstract execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    cursor?: DocumentReference,
     orderByObj?: IOrderByParams,
     single?: boolean
   ): Promise<T[]>;

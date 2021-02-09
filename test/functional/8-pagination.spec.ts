@@ -1,3 +1,4 @@
+import { DocumentReference } from '@google-cloud/firestore';
 import { getRepository, Collection } from '../../src';
 import { Band as BandEntity } from '../fixture';
 import { getUniqueColName } from '../setup';
@@ -34,7 +35,7 @@ describe('Integration test: Pagination', () => {
     expect(byWebsite[0].id).toEqual('dream-theater-0');
 
     // @ts-ignore
-    const cursor: any = byWebsite.cursor;
+    const cursor: DocumentReference = byWebsite.cursor;
 
     // Filter a band by subfield
     const byWebsitePaged = await bandRepository

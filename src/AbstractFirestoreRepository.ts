@@ -139,8 +139,9 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     let lastRef: DocumentReference | null = null;
     const results: any = q.docs.filter(d => d.exists).map(d => {
       lastRef = d.ref;
-      this.extractTFromDocSnap(d, tran, tranRefStorage)
+      return this.extractTFromDocSnap(d, tran, tranRefStorage).data;
     });
+
     Object.defineProperty(results, 'cursor', {
       value: lastRef,
       writable: false

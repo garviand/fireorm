@@ -18,6 +18,7 @@ import {
   IRepository,
   PartialBy,
   IEntityConstructor,
+  IEntityExtraction,
   ITransactionReferenceStorage,
 } from './types';
 
@@ -116,7 +117,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     doc: DocumentSnapshot,
     tran?: Transaction,
     tranRefStorage?: ITransactionReferenceStorage
-  ): T => {
+  ): IEntityExtraction<T> => {
     const entity = plainToClass(this.colMetadata.entityConstructor, {
       id: doc.id,
       ...this.transformFirestoreTypes(doc.data() || {}),

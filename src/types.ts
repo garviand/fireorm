@@ -134,6 +134,11 @@ export interface IEntity {
   id: string;
 }
 
+export interface IEntityExtraction<T = IEntity> {
+  data: T;
+  ref: DocumentReference<FirebaseFirestore.DocumentData>;
+}
+
 export type Constructor<T> = { new (): T };
 export type EntityConstructorOrPathConstructor<T extends IEntity> = { new (): T };
 export type IEntityConstructor = Constructor<IEntity>;

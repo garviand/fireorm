@@ -31,7 +31,6 @@
     "build:strict:watch": "yarn run build:strict -- -w",
     "lint": "eslint '*/**/*.{js,ts}'",
     "lint:md": "remark README.md -o README.md",
-    "prepare": "echo TRYING",
     "release": "semantic-release",
     "test": "jest src --coverage=true",
     "test:integration": "jest -c test/jest.integration.js",

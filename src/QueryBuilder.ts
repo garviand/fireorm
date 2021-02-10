@@ -1,3 +1,4 @@
+import { DocumentReference } from '@google-cloud/firestore';
 import { getPath } from 'ts-object-path';
 
 import {
@@ -14,6 +15,7 @@ import {
 export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
+  protected cursor: DocumentReference;
   protected orderByObj: IOrderByParams;
 
   constructor(protected executor: IQueryExecutor<T>) {}
@@ -141,6 +143,16 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
+  after(cursor: DocumentReference): QueryBuilder<T> {
+    if (this.cursor) {
+      throw new Error(
+        'An after function cannot be called more than once in the same query expression'
+      );
+    }
+    this.cursor = cursor;
+    return this;
+  }
+
   orderByAscending(prop: IWherePropParam<T>) {
     if (this.orderByObj) {
       throw new Error(
@@ -171,14 +183,15 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  find(): Promise<T[]> {
-    return this.executor.execute(this.queries, this.limitVal, this.orderByObj) as Promise<T[]>;
+  find() {
+    return this.executor.execute(this.queries, this.limitVal, this.cursor, this.orderByObj) as Promise<T[]>;
   }
 
   watch(callback: (documents: T[]) => void) {
     return this.executor.execute(
       this.queries,
       this.limitVal,
+      this.cursor,
       this.orderByObj,
       false,
       callback
@@ -189,6 +202,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     const queryResult = await this.executor.execute(
       this.queries,
       this.limitVal,
+      this.cursor,
       this.orderByObj,
       true
     ) as T[];

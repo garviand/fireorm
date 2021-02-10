@@ -61,12 +61,21 @@ export interface ILimitable<T extends IEntity> {
   limit(limitVal: number): IQueryBuilder<T>;
 }
 
-export type IQueryBuilder<T extends IEntity> = IQueryable<T> & IOrderable<T> & ILimitable<T>;
+export interface IPageable<T extends IEntity> {
+  after(cursor: DocumentReference): IQueryBuilder<T>;
+}
+
+export type IQueryBuilder<T extends IEntity> = 
+  IQueryable<T> &
+  IOrderable<T> &
+  ILimitable<T> &
+  IPageable<T>;
 
 export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
+    cursor?: DocumentReference,
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void
@@ -125,6 +134,11 @@ export type ISubCollection<T extends IEntity> = IRepository<T> & {
 
 export interface IEntity {
   id: string;
+}
+
+export interface IEntityExtraction<T = IEntity> {
+  data: T;
+  ref: DocumentReference<FirebaseFirestore.DocumentData>;
 }
 
 export type Constructor<T> = { new (): T };

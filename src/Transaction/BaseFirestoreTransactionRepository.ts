@@ -40,7 +40,7 @@ export class TransactionRepository<T extends IEntity> extends AbstractFirestoreR
     return this.transaction
       .get(query)
       .then(c =>
-        c.exists ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage) : null
+        c.exists ? this.extractTFromDocSnap(c, this.transaction, this.tranRefStorage).data : null
       );
   }
 

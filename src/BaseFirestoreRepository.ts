@@ -91,7 +91,7 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
   async execute(
     queries: Array<IFireOrmQueryLine>,
     limitVal?: number,
-    cursor?: DocumentReference,
+    cursor?: any,
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void
@@ -111,9 +111,8 @@ export class BaseFirestoreRepository<T extends IEntity> extends AbstractFirestor
       query = query.limit(limitVal);
     }
 
-    if (cursor) {
-      const cursorDocument = await cursor.get();
-      query = query.startAfter(cursorDocument);
+    if (cursor && orderByObj) {
+      query = query.startAfter(cursor[orderByObj.fieldPath]);
     }
 
     if (onUpdate) {

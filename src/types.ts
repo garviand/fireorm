@@ -62,7 +62,7 @@ export interface ILimitable<T extends IEntity> {
 }
 
 export interface IPageable<T extends IEntity> {
-  after(cursor: DocumentReference): IQueryBuilder<T>;
+  after(cursor: any): IQueryBuilder<T>;
 }
 
 export type IQueryBuilder<T extends IEntity> = 
@@ -75,7 +75,7 @@ export interface IQueryExecutor<T> {
   execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    cursor?: DocumentReference,
+    cursor?: any,
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void

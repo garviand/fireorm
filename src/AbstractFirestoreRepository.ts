@@ -136,16 +136,10 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     tran?: Transaction,
     tranRefStorage?: ITransactionReferenceStorage
   ): T[] => {
-    let lastRef: DocumentReference | null = null;
     const results: any = q.docs.filter(d => d.exists).map(d => {
-      lastRef = d.ref;
       return this.extractTFromDocSnap(d, tran, tranRefStorage).data;
     });
-
-    Object.defineProperty(results, 'cursor', {
-      value: lastRef,
-      writable: false
-    });
+    
     return results;
   };
 
@@ -317,7 +311,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     return new QueryBuilder<T>(this).limit(limitVal);
   }
 
-  after(cursor: DocumentReference): IQueryBuilder<T> {
+  after(cursor: any): IQueryBuilder<T> {
     if (!cursor) {
       throw new Error('a cursor must be included');
     }
@@ -433,7 +427,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   abstract execute(
     queries: IFireOrmQueryLine[],
     limitVal?: number,
-    cursor?: DocumentReference,
+    cursor?: any,
     orderByObj?: IOrderByParams,
     single?: boolean,
     onUpdate?: (documents: T[]) => void

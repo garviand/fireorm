@@ -17,7 +17,7 @@ describe('Integration test: Pagination', () => {
       const dt = new Band();
       dt.id = `dream-theater-${i}`;
       dt.name = 'DreamTheater';
-      dt.formationYear = 1985;
+      dt.formationYear = 1985 + i;
       dt.genres = ['progressive-metal', 'progressive-rock'];
       dt.extra = {
         website: 'www.dreamtheater.net',
@@ -27,22 +27,22 @@ describe('Integration test: Pagination', () => {
 
     // Filter a band by subfield
     const byWebsite = await bandRepository
-      .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
+      .orderByAscending('formationYear')
       .limit(3)
       .find();
 
     expect(byWebsite.length).toEqual(3);
     expect(byWebsite[0].id).toEqual('dream-theater-0');
 
-    // @ts-ignore
-    const cursor: DocumentReference = byWebsite.cursor;
-
     // Filter a band by subfield
     const byWebsitePaged = await bandRepository
-      .whereEqualTo(a => a.extra.website, 'www.dreamtheater.net')
+      .orderByAscending('formationYear')
       .limit(3)
-      .after(cursor)
+      .after(byWebsite[byWebsite.length - 1])
       .find();
+
+      console.log(byWebsite[byWebsite.length - 1])
+      console.log(byWebsitePaged[0])
 
       expect(byWebsitePaged[0].id).toEqual('dream-theater-3');
 

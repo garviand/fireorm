@@ -5,4 +5,5 @@ module.exports = {
   setupFiles: ['dotenv/config'],
   setupFilesAfterEnv: ['./setup.ts'],
   verbose: true,
+  testRegex: '/test/functional/.*pagination.spec.ts?$',
 };

@@ -15,7 +15,7 @@ import {
 export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
-  protected cursor: DocumentReference;
+  protected cursor: any;
   protected orderByObj: IOrderByParams;
 
   constructor(protected executor: IQueryExecutor<T>) {}
@@ -143,7 +143,7 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
     return this;
   }
 
-  after(cursor: DocumentReference): QueryBuilder<T> {
+  after(cursor: any): QueryBuilder<T> {
     if (this.cursor) {
       throw new Error(
         'An after function cannot be called more than once in the same query expression'

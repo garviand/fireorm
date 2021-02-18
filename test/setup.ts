@@ -6,7 +6,7 @@ console.log('Running Integration Test Setup');
 const serviceAccount = {
   projectId: process.env.FIRESTORE_PROJECT_ID,
   databaseUrl: process.env.FIREBASE_DATABASE_URL,
-  privateKey: Buffer.from(process.env.FIRESTORE_PRIVATE_KEY_BASE_64, 'base64').toString('ascii'),
+  privateKey: process.env.FIRESTORE_PRIVATE_KEY_BASE_64.replace(/\\n/g, '\n'),
   clientEmail: process.env.FIRESTORE_CLIENT_EMAIL,
 };
 

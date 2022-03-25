@@ -5,9 +5,8 @@
 [![Typescript lang](https://img.shields.io/badge/Language-Typescript-Blue.svg)](https://www.typescriptlang.org)
 [![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors)
 [![License](https://img.shields.io/npm/l/fireorm.svg?style=flat)](https://www.npmjs.com/package/fireorm)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fireorm/community)
 
-Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when dealing with a Firestore database. Fireorm tries to ease the development of apps that rely on Firestore at the database layer by abstracting the access layer providing and familiar repository pattern. It basically helps us not worrying about Firestore details and focusing in what matters: adding cool new features!
+Fireorm is a tiny wrapper on top of firebase-admin that makes life easier when dealing with a Firestore database. Fireorm tries to ease the development of apps that rely on Firestore at the database layer by abstracting the access layer providing a familiar repository pattern. It basically helps us not worry about Firestore details and focus on what matters: adding cool new features!
 
 You can read more about the motivations and features of fireorm [on its introductory post](https://medium.com/p/ba7734644684). Also, the [API documentation](https://wovalle.github.io/fireorm) is available.
 
@@ -18,10 +17,10 @@ You can read more about the motivations and features of fireorm [on its introduc
 ```bash
 yarn add fireorm reflect-metadata #or npm install fireorm reflect-metadata
 
-# note: reflect-metadata shim is required
+# note: the reflect-metadata shim is required
 ```
 
-2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your firestore application:
+2. [Initialize](https://firebase.google.com/docs/firestore/quickstart#initialize) your Firestore application:
 
 ```typescript
 import * as admin from 'firebase-admin';
@@ -38,7 +37,7 @@ const firestore = admin.firestore();
 fireorm.initialize(firestore);
 ```
 
-3.  Create your firestore models!
+3.  Create your Firestore models:
 
 ```typescript
 import { Collection } from 'fireorm';
@@ -77,7 +76,7 @@ await todoRepository.delete(mySuperTodoDocument.id); // Delete todo
 
 ### Firebase Complex Data Types
 
-Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, Fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you have to return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/d8f79090b7006675f2cb5014bb5ca7a9dfbfa8c1/src/BaseFirestoreRepository.spec.ts#L471-L476).
+Firestore has support for [complex data types](https://firebase.google.com/docs/firestore/manage-data/data-types) such as GeoPoint and Reference. Full handling of complex data types is [being handled in this issue](https://github.com/wovalle/fireorm/issues/58). Temporarily, fireorm will export [Class Transformer's @Type](https://github.com/typestack/class-transformer#working-with-nested-objects) decorator. It receives a lamda where you return the type you want to cast to. [See GeoPoint Example](https://github.com/wovalle/fireorm/blob/d8f79090b7006675f2cb5014bb5ca7a9dfbfa8c1/src/BaseFirestoreRepository.spec.ts#L471-L476).
 
 #### Limitations
 
@@ -93,7 +92,7 @@ If you want to cast GeoPoints to your custom class, it must have `latitude: numb
 git clone git@github.com:wovalle/fireorm.git
 ```
 
-2.  Install the dependencies.
+2.  Install the dependencies:
 
 ```bash
 yarn # npm install
@@ -106,7 +105,7 @@ Fireorm has two types of tests:
 - Unit tests: `yarn test # or npm test`
 - Integration tests: `yarn test:integration # or npm test:integration`
 
-To be able to run the integration tests you'll need to [create a firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk) and declare some [environment variables](https://github.com/wovalle/fireorm/blob/master/test/setup.ts#L5-L13).
+To be able to run the integration tests you need to [create a Firebase service account](https://firebase.google.com/docs/admin/setup#initialize_the_sdk) and declare some [environment variables](https://github.com/wovalle/fireorm/blob/master/test/setup.ts#L5-L13).
 
 Test files must follow the naming convention `*.test.ts` and use [jest](https://jestjs.io/) as the test runner.
 
@@ -116,7 +115,7 @@ This repo uses [Conventional Commits](https://www.conventionalcommits.org/) as t
 
 ### Release a new version
 
-This repo uses [Sematic Release](https://github.com/semantic-release/semantic-release) to automatically release new versions as soon as they land on master.
+This repo uses [Semantic Release](https://github.com/semantic-release/semantic-release) to automatically release new versions as soon as they land on master.
 
 Commits must follow [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
 
@@ -148,7 +147,7 @@ git push --follow-tags
 npm publish
 ```
 
-- To deploy the documentation
+- To deploy the documentation:
 
 ```bash
 yarn deploy:doc # or npm deploy:doc
@@ -194,6 +193,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Fame513"><img src="https://avatars1.githubusercontent.com/u/2944505?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yaroslav Nekryach</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=Fame513" title="Code">💻</a></td>
     <td align="center"><a href="https://www.linkedin.com/in/dmytro-nikitiuk/"><img src="https://avatars0.githubusercontent.com/u/40293865?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmytro Nikitiuk</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=tomorroN" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/JingWangTW"><img src="https://avatars0.githubusercontent.com/u/20182367?v=4?s=100" width="100px;" alt=""/><br /><sub><b>JingWangTW</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=JingWangTW" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rinkstiekema"><img src="https://avatars.githubusercontent.com/u/5337711?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rink Stiekema</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=rinkstiekema" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/danieleisenhardt"><img src="https://avatars.githubusercontent.com/u/2325519?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=danieleisenhardt" title="Code">💻</a></td>
+    <td align="center"><a href="https://zabreznik.net"><img src="https://avatars.githubusercontent.com/u/1311249?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Zabreznik</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=MarZab" title="Code">💻</a></td>
+    <td align="center"><a href="http://jomendez.com"><img src="https://avatars.githubusercontent.com/u/8228498?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jose Mendez</b></sub></a><br /><a href="https://github.com/wovalle/fireorm/commits?author=jomendez" title="Code">💻</a></td>
   </tr>
 </table>
 

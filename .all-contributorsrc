@@ -130,6 +130,42 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "rinkstiekema",
+      "name": "Rink Stiekema",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5337711?v=4",
+      "profile": "https://github.com/rinkstiekema",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "danieleisenhardt",
+      "name": "Daniel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2325519?v=4",
+      "profile": "https://github.com/danieleisenhardt",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "MarZab",
+      "name": "Marko Zabreznik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1311249?v=4",
+      "profile": "https://zabreznik.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jomendez",
+      "name": "Jose Mendez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8228498?v=4",
+      "profile": "http://jomendez.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

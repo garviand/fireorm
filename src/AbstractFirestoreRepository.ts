@@ -6,6 +6,7 @@ import {
   CollectionReference,
   Transaction,
 } from '@google-cloud/firestore';
+import { serializeKey } from './Decorators/Serialize';
 import { ValidationError } from './Errors/ValidationError';
 
 import {
@@ -20,6 +21,7 @@ import {
   IEntityConstructor,
   IEntityExtraction,
   ITransactionReferenceStorage,
+  ICustomQuery,
 } from './types';
 
 import { isDocumentReference, isGeoPoint, isObject, isTimestamp } from './TypeGuards';
@@ -28,12 +30,14 @@ import { getMetadataStorage } from './MetadataUtils';
 import { MetadataStorageConfig, FullCollectionMetadata } from './MetadataStorage';
 
 import { BaseRepository } from './BaseRepository';
-import QueryBuilder from './QueryBuilder';
+import { QueryBuilder } from './QueryBuilder';
 import { serializeEntity } from './utils';
 import { NoMetadataError } from './Errors';
 
-export abstract class AbstractFirestoreRepository<T extends IEntity> extends BaseRepository
-  implements IRepository<T> {
+export abstract class AbstractFirestoreRepository<T extends IEntity>
+  extends BaseRepository
+  implements IRepository<T>
+{
   protected readonly colMetadata: FullCollectionMetadata;
   protected readonly path: string;
   protected readonly config: MetadataStorageConfig;
@@ -113,6 +117,40 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     });
   };
 
+  protected initializeSerializedObjects(entity: T) {
+    Object.keys(entity).forEach(propertyKey => {
+      if (Reflect.getMetadata(serializeKey, entity, propertyKey) !== undefined) {
+        const constructor = Reflect.getMetadata(serializeKey, entity, propertyKey);
+        const data = entity as unknown as { [k: string]: unknown };
+        const subData = data[propertyKey] as { [k: string]: unknown };
+
+        if (Array.isArray(subData)) {
+          (entity as unknown as { [key: string]: unknown })[propertyKey] = subData.map(value => {
+            const subEntity = new constructor();
+
+            for (const i in value) {
+              subEntity[i] = value[i];
+            }
+
+            this.initializeSerializedObjects(subEntity);
+
+            return subEntity;
+          });
+        } else {
+          const subEntity = new constructor();
+
+          for (const i in subData) {
+            subEntity[i] = subData[i];
+          }
+
+          this.initializeSerializedObjects(subEntity);
+
+          (entity as unknown as { [key: string]: unknown })[propertyKey] = subEntity;
+        }
+      }
+    });
+  }
+
   protected extractTFromDocSnap = (
     doc: DocumentSnapshot,
     tran?: Transaction,
@@ -124,6 +162,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     }) as T;
 
     this.initializeSubCollections(entity, tran, tranRefStorage);
+    this.initializeSerializedObjects(entity);
 
     return {
       data: entity,
@@ -382,6 +421,19 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
   }
 
   /**
+   * Returns a new QueryBuilder with an custom query
+   * specified by @param func. Can only be used once per query.
+   *
+   * @param {ICustomQuery<T>} func function to run in a new query
+   * @returns {QueryBuilder<T>} A new QueryBuilder with the specified
+   * custom query applied.
+   * @memberof AbstractFirestoreRepository
+   */
+  customQuery(func: ICustomQuery<T>): IQueryBuilder<T> {
+    return new QueryBuilder<T>(this).customQuery(func);
+  }
+
+  /**
    * Uses class-validator to validate an entity using decorators set in the collection class
    *
    * @param item class or object representing an entity
@@ -397,7 +449,7 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
        */
       const entity = item instanceof Entity ? item : Object.assign(new Entity(), item);
 
-      return classValidator.validate(entity);
+      return classValidator.validate(entity, this.config.validatorOptions);
     } catch (error: any) {
       if (error.code === 'MODULE_NOT_FOUND') {
         throw new Error(
@@ -430,7 +482,8 @@ export abstract class AbstractFirestoreRepository<T extends IEntity> extends Bas
     cursor?: any,
     orderByObj?: IOrderByParams,
     single?: boolean,
-    onUpdate?: (documents: T[]) => void
+    onUpdate?: (documents: T[]) => void,
+    customQuery?: ICustomQuery<T>
   ): Promise<T[] | (() => void)>;
 
   /**

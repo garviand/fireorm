@@ -1,15 +1,16 @@
-import { IEntity, Constructor } from '../types';
 import { Firestore, DocumentReference } from '@google-cloud/firestore';
-import { FullCollectionMetadata } from '../MetadataStorage';
 import { serializeEntity } from '../utils';
-import { ValidationError } from '../Errors/ValidationError';
+import type { FullCollectionMetadata } from '../MetadataStorage';
+import type { ValidationError } from '../Errors/ValidationError';
+import type { IEntity, Constructor, ValidatorOptions } from '../types';
 
 type BatchOperation<T extends IEntity> = {
   type: 'create' | 'update' | 'delete';
-  item: IEntity;
+  item: T;
   ref: DocumentReference;
   collectionMetadata: FullCollectionMetadata;
   validateModels: boolean;
+  validatorOptions?: ValidatorOptions;
 };
 
 export class FirestoreBatchUnit {
@@ -23,7 +24,8 @@ export class FirestoreBatchUnit {
     item: T,
     ref: DocumentReference,
     collectionMetadata: FullCollectionMetadata,
-    validateModels: boolean
+    validateModels: boolean,
+    validatorOptions?: ValidatorOptions
   ) {
     this.operations.push({
       type,
@@ -31,6 +33,7 @@ export class FirestoreBatchUnit {
       ref,
       collectionMetadata,
       validateModels,
+      validatorOptions,
     });
   }
 
@@ -48,7 +51,11 @@ export class FirestoreBatchUnit {
 
     for (const op of this.operations) {
       if (op.validateModels && ['create', 'update'].includes(op.type)) {
-        const errors = await this.validate(op.item, op.collectionMetadata.entityConstructor);
+        const errors = await this.validate(
+          op.item,
+          op.collectionMetadata.entityConstructor,
+          op.validatorOptions
+        );
 
         if (errors.length) {
           throw errors;
@@ -77,7 +84,11 @@ export class FirestoreBatchUnit {
     return result;
   };
 
-  async validate(item: IEntity, Entity: Constructor<IEntity>): Promise<ValidationError[]> {
+  async validate(
+    item: IEntity,
+    Entity: Constructor<IEntity>,
+    validatorOptions?: ValidatorOptions
+  ): Promise<ValidationError[]> {
     try {
       const classValidator = await import('class-validator');
 
@@ -86,7 +97,7 @@ export class FirestoreBatchUnit {
        */
       const entity = item instanceof Entity ? item : Object.assign(new Entity(), item);
 
-      return classValidator.validate(entity);
+      return classValidator.validate(entity, validatorOptions);
     } catch (error: any) {
       if (error.code === 'MODULE_NOT_FOUND') {
         throw new Error(

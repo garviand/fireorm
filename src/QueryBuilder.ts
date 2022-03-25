@@ -10,13 +10,16 @@ import {
   IQueryExecutor,
   IEntity,
   IWherePropParam,
+  ICustomQuery,
 } from './types';
 
-export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
+export class QueryBuilder<T extends IEntity> implements IQueryBuilder<T> {
   protected queries: Array<IFireOrmQueryLine> = [];
   protected limitVal: number;
   protected cursor: any;
   protected orderByObj: IOrderByParams;
+  protected customQueryFunction?: ICustomQuery<T>;
+  protected orderByFields: Set<string> = new Set();
 
   constructor(protected executor: IQueryExecutor<T>) {}
 
@@ -154,10 +157,17 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
   }
 
   orderByAscending(prop: IWherePropParam<T>) {
-    if (this.orderByObj) {
+    const fieldProp: string = typeof prop == 'string' ? prop : '';
+    const alreadyOrderedByField = this.orderByFields.has(fieldProp);
+
+    if (this.orderByObj && alreadyOrderedByField) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
+    }
+
+    if (!alreadyOrderedByField && fieldProp) {
+      this.orderByFields.add(fieldProp);
     }
 
     this.orderByObj = {
@@ -169,10 +179,17 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
   }
 
   orderByDescending(prop: IWherePropParam<T>) {
-    if (this.orderByObj) {
+    const fieldProp: string = typeof prop == 'string' ? prop : '';
+    const alreadyOrderedByField = this.orderByFields.has(fieldProp);
+
+    if (this.orderByObj && alreadyOrderedByField) {
       throw new Error(
         'An orderBy function cannot be called more than once in the same query expression'
       );
+    }
+
+    if (!alreadyOrderedByField && fieldProp) {
+      this.orderByFields.add(fieldProp);
     }
 
     this.orderByObj = {
@@ -194,8 +211,19 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
       this.cursor,
       this.orderByObj,
       false,
-      callback
+      callback,
+      this.customQueryFunction
     ) as Promise<() => void>;
+  }
+
+  customQuery(func: ICustomQuery<T>) {
+    if (this.customQueryFunction) {
+      throw new Error('Only one custom query can be used per query expression');
+    }
+
+    this.customQueryFunction = func;
+
+    return this;
   }
 
   async findOne(): Promise<T | null> {
@@ -204,7 +232,9 @@ export default class QueryBuilder<T extends IEntity> implements IQueryBuilder<T>
       this.limitVal,
       this.cursor,
       this.orderByObj,
-      true
+      true,
+      undefined,
+      this.customQueryFunction
     ) as T[];
 
     return queryResult.length ? queryResult[0] : null;

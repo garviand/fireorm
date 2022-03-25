@@ -20,7 +20,7 @@
     "orm"
   ],
   "scripts": {
-    "build": "tsc && yarn build:strict",
+    "build": "tsc && npm run build:strict",
     "build:typedoc": "typedoc --options docgen/typedoc.json",
     "build:docsify": "yarn ts-node docgen/build.ts",
     "build:doc": "yarn rimraf docs && yarn build:typedoc && yarn build:docsify && cp CNAME docs/CNAME",
@@ -31,6 +31,7 @@
     "build:strict:watch": "yarn run build:strict -- -w",
     "lint": "eslint '*/**/*.{js,ts}'",
     "lint:md": "remark README.md -o README.md",
+    "prepare": "npm run build",
     "release": "semantic-release",
     "test": "jest src --coverage=true",
     "test:integration": "jest -c test/jest.integration.js",
